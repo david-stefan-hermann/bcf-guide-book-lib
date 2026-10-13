@@ -5,6 +5,7 @@ import bcf.guidebook.BookStyle;
 import bcf.guidebook.BookTheme;
 import bcf.guidebook.Chapter;
 import bcf.guidebook.Section;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
-import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,9 +229,9 @@ public class GuideBookScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
-        switch (event.key()) {
-            case GLFW.GLFW_KEY_LEFT, GLFW.GLFW_KEY_PAGE_UP -> turnTo(page - 1);
-            case GLFW.GLFW_KEY_RIGHT, GLFW.GLFW_KEY_PAGE_DOWN -> turnTo(page + 1);
+        switch (event.input()) {
+            case InputConstants.KEY_LEFT, InputConstants.KEY_PAGEUP -> turnTo(page - 1);
+            case InputConstants.KEY_RIGHT, InputConstants.KEY_PAGEDOWN -> turnTo(page + 1);
             default -> {
                 return super.keyPressed(event);
             }

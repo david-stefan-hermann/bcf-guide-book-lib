@@ -12,6 +12,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -182,7 +183,7 @@ public final class Book {
         }
         ItemStack book = new ItemStack(item);
         if (!player.getInventory().add(book)) {
-            player.drop(book, false);
+            player.drop(book, false, Prediction.SERVER_ONLY);
         }
         player.setAttached(gotBook, true);
     }
