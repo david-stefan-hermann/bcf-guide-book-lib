@@ -1,6 +1,6 @@
 package bcf.guidebook;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A mod's own colours for its guide book (ARGB). The layout is not part of the theme: that is {@link BookStyle}, the
@@ -8,7 +8,7 @@ import net.minecraft.resources.Identifier;
  * {@link BookStyle#PANEL_H} pixels, the page inside the margins and above the footer); tabs and buttons are always
  * drawn in the theme's colours.
  */
-public record BookTheme(Identifier texture, int panel, int border, int light, int shadow, int tab, int tabHover,
+public record BookTheme(ResourceLocation texture, int panel, int border, int light, int shadow, int tab, int tabHover,
                         int page, int pageEdge, int rule, int title, int heading, int body, int soft, int slot,
                         int slotEdge, int arrow, int button, int buttonHover, int buttonOff, int buttonEdge,
                         int buttonLight, int buttonShadow, int buttonText, int buttonTextOff, int pageNumber) {
@@ -19,7 +19,7 @@ public record BookTheme(Identifier texture, int panel, int border, int light, in
     }
 
     public static final class Builder {
-        private Identifier texture;
+        private ResourceLocation texture;
         private int panel = 0xFF6E7480, border = 0xFF000000, light = 0xFF9AA0AC, shadow = 0xFF454A54;
         private int tab = 0xFF565B66, tabHover = 0xFF8A909C;
         private int page = 0xFFF6F3EC, pageEdge = 0xFFB4B0A6;
@@ -34,7 +34,7 @@ public record BookTheme(Identifier texture, int panel, int border, int light, in
         }
 
         /** A picture as panel and page instead of the drawn ones; {@link #panel} still colours the open tab. */
-        public Builder texture(Identifier texture) {
+        public Builder texture(ResourceLocation texture) {
             this.texture = texture;
             return this;
         }

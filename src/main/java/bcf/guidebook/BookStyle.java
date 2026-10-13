@@ -1,8 +1,9 @@
 package bcf.guidebook;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * What is the same in every guide book: the font, the line heights and the measures of the panel. Changing a value
@@ -12,9 +13,9 @@ public final class BookStyle {
     /**
      * The font of everything written in the book. For another one, put its definition under
      * {@code assets/bcfguidebooklib/font/<name>.json} and name it here:
-     * {@code new FontDescription.Resource(Identifier.fromNamespaceAndPath("bcfguidebooklib", "<name>"))}.
+     * {@code ResourceLocation.fromNamespaceAndPath("bcfguidebooklib", "<name>")}.
      */
-    public static final FontDescription FONT = FontDescription.DEFAULT;
+    public static final ResourceLocation FONT = Style.DEFAULT_FONT;
     /** Line heights of headings and of all other text, and the gap under a paragraph. */
     public static final int HEADING_LINE = 10, TEXT_LINE = 9, GAP = 5;
 

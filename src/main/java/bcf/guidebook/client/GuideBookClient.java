@@ -13,7 +13,7 @@ public final class GuideBookClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        GuideBookItem.opener = book -> Minecraft.getInstance().gui.setScreen(new GuideBookScreen(book));
+        GuideBookItem.opener = book -> Minecraft.getInstance().setScreen(new GuideBookScreen(book));
         String shots = System.getProperty("bcf.guidebook.shots");
         if (shots != null) {
             ClientTickEvents.END_CLIENT_TICK.register(minecraft -> bookShots(minecraft, shots.split(",")));
@@ -32,32 +32,32 @@ public final class GuideBookClient implements ClientModInitializer {
         String modId = modIds[mod];
         Book book = Book.of(modId);
         if (shot < 0) {
-            if (book == null || minecraft.player == null || minecraft.gui.screen() != null
-                    || minecraft.gui.overlay() != null) {
+            if (book == null || minecraft.player == null || minecraft.screen != null
+                    || minecraft.getOverlay() != null) {
                 wait = 0;
             } else if (++wait >= 40) { // two seconds in the world, so it is drawn behind the book
                 wait = 0;
                 shot = 0;
-                minecraft.gui.setScreen(new GuideBookScreen(book, 0));
+                minecraft.setScreen(new GuideBookScreen(book, 0));
             }
             return;
         }
-        if (!(minecraft.gui.screen() instanceof GuideBookScreen screen)) {
+        if (!(minecraft.screen instanceof GuideBookScreen screen)) {
             return;
         }
-        minecraft.gui.toastManager().clear();
+        minecraft.getToasts().clear();
         if (++wait < 10) {
             return;
         }
         wait = 0;
         Screenshot.grab(minecraft.gameDirectory, String.format("book_%s_%s_%02d.png", modId,
-                minecraft.getLanguageManager().getSelected(), shot + 1), minecraft.gameRenderer.mainRenderTarget(), 1,
+                minecraft.getLanguageManager().getSelected(), shot + 1), minecraft.getMainRenderTarget(),
                 message -> { });
         if (++shot < screen.pageCount()) {
             screen.turnTo(shot);
         } else if (++mod < modIds.length) {
             shot = -1;
-            minecraft.gui.setScreen(null);
+            minecraft.setScreen(null);
         } else {
             minecraft.stop();
         }

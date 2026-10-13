@@ -1,6 +1,6 @@
 package bcf.guidebook;
 
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public sealed interface Section {
     }
 
     /** Square pictures side by side, each {@code size} wide, from textures {@code textureSize} wide. */
-    record Pictures(List<Identifier> textures, int size, int textureSize, boolean framed) implements Section {
+    record Pictures(List<ResourceLocation> textures, int size, int textureSize, boolean framed) implements Section {
     }
 
     /** A square of one item in slots, {@code side} to a side, with the texts beside it. */

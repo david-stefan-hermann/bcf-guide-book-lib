@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +47,7 @@ public final class Book {
         this.modId = modId;
         this.theme = theme;
         this.chapters = chapters;
-        this.gotBook = AttachmentRegistry.create(Identifier.fromNamespaceAndPath(modId, "got_guide_book"),
+        this.gotBook = AttachmentRegistry.create(ResourceLocation.fromNamespaceAndPath(modId, "got_guide_book"),
                 b -> b.persistent(Codec.BOOL).copyOnDeath());
     }
 
@@ -116,14 +116,15 @@ public final class Book {
 
     /** One picture {@code textures/gui/book/<name>.png} of the mod. */
     public Section.Pictures picture(String name, int size, int textureSize, boolean framed) {
-        return new Section.Pictures(List.of(Identifier.fromNamespaceAndPath(modId, "textures/gui/book/" + name + ".png")),
+        return new Section.Pictures(List.of(ResourceLocation.fromNamespaceAndPath(modId, "textures/gui/book/" + name + ".png")),
                 size, textureSize, framed);
     }
 
     // ponytail: reads the mod's own recipe files; a tag shows its stand-in, datapack overrides are not shown
     /**
      * The recipe {@code data/<modid>/recipe/<name>.json} as a crafting grid: shapeless ingredients fill the fields in
-     * order, a shaped pattern is centred. The client has no recipe manager since 1.21.2, hence the file.
+     * order, a shaped pattern is centred. Read from the file as on the newer versions, whose client has no recipe
+     * manager.
      */
     public Section.Recipe recipe(String name) {
         JsonObject json = json("data/" + modId + "/recipe/" + name + ".json");
@@ -151,8 +152,9 @@ public final class Book {
     }
 
     private ItemStack stack(JsonElement id) {
-        String name = id.getAsString();
-        return new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.parse(standIns.getOrDefault(name, name))));
+        String name = !id.isJsonObject() ? id.getAsString() : id.getAsJsonObject().has("tag")
+                ? "#" + id.getAsJsonObject().get("tag").getAsString() : id.getAsJsonObject().get("item").getAsString();
+        return new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.parse(standIns.getOrDefault(name, name))));
     }
 
     private JsonObject json(String path) {

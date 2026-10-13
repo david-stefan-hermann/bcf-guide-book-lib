@@ -6,12 +6,10 @@ import bcf.guidebook.BookTheme;
 import bcf.guidebook.Chapter;
 import bcf.guidebook.Section;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -228,12 +226,12 @@ public class GuideBookScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(KeyEvent event) {
-        switch (event.key()) {
+    public boolean keyPressed(int key, int scanCode, int modifiers) {
+        switch (key) {
             case GLFW.GLFW_KEY_LEFT, GLFW.GLFW_KEY_PAGE_UP -> turnTo(page - 1);
             case GLFW.GLFW_KEY_RIGHT, GLFW.GLFW_KEY_PAGE_DOWN -> turnTo(page + 1);
             default -> {
-                return super.keyPressed(event);
+                return super.keyPressed(key, scanCode, modifiers);
             }
         }
         return true;
@@ -253,11 +251,10 @@ public class GuideBookScreen extends Screen {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
         if (theme.texture() != null) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, theme.texture(), left, top, 0, 0, PANEL_W, PANEL_H, PANEL_W,
-                    PANEL_H);
+            graphics.blit(theme.texture(), left, top, 0, 0, PANEL_W, PANEL_H, PANEL_W, PANEL_H);
             return;
         }
         panel(graphics, left, top, PANEL_W, PANEL_H);
@@ -268,7 +265,8 @@ public class GuideBookScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.render(graphics, mouseX, mouseY, partialTick); // the background and the buttons; the page goes on top
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         hovered = ItemStack.EMPTY;
@@ -276,8 +274,8 @@ public class GuideBookScreen extends Screen {
         Chapter chapter = chapters.get(current.chapter());
         int x = left + PAGE_MARGIN + TEXT_MARGIN;
         int y = top + PAGE_MARGIN + 3;
-        graphics.item(chapter.icon(), x, y);
-        graphics.text(font, BookStyle.translated(chapter.title()), x + 20, y + 4, theme.title(), false);
+        graphics.renderItem(chapter.icon(), x, y);
+        graphics.drawString(font, BookStyle.translated(chapter.title()), x + 20, y + 4, theme.title(), false);
         graphics.fill(x, y + HEADER_H - 4, x + TEXT_W, y + HEADER_H - 3, theme.rule());
 
         int cursorY = top + PAGE_MARGIN + HEADER_H + 2;
@@ -313,8 +311,8 @@ public class GuideBookScreen extends Screen {
                             graphics.fill(px, cursorY, px + size, cursorY + size, theme.pageEdge());
                             graphics.fill(px + 1, cursorY + 1, px + size - 1, cursorY + size - 1, theme.page());
                         }
-                        graphics.blit(RenderPipelines.GUI_TEXTURED, pictures.textures().get(i), px, cursorY, 0, 0, size,
-                                size, texture, texture, texture, texture);
+                        graphics.blit(pictures.textures().get(i), px, cursorY, size, size, 0, 0, texture, texture, texture,
+                                texture);
                     }
                 }
                 case Section.Break turn -> {
@@ -322,26 +320,25 @@ public class GuideBookScreen extends Screen {
             }
             cursorY += placed.height();
         }
-        graphics.centeredText(font, BookStyle.styled(Component.literal((page + 1) + " / " + pages.size())),
+        graphics.drawCenteredString(font, BookStyle.styled(Component.literal((page + 1) + " / " + pages.size())),
                 left + PANEL_W / 2, top + PANEL_H - FOOTER_H + 7, theme.pageNumber());
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         if (!hovered.isEmpty()) {
-            graphics.setTooltipForNextFrame(font, hovered, mouseX, mouseY);
+            graphics.renderTooltip(font, hovered, mouseX, mouseY);
         }
     }
 
     // ---------------------------------------------------------------- pieces
 
-    private void lines(GuiGraphicsExtractor graphics, List<FormattedCharSequence> lines, int x, int y, int lineHeight,
+    private void lines(GuiGraphics graphics, List<FormattedCharSequence> lines, int x, int y, int lineHeight,
                        int colour) {
         for (FormattedCharSequence line : lines) {
-            graphics.text(font, line, x, y, colour, false);
+            graphics.drawString(font, line, x, y, colour, false);
             y += lineHeight;
         }
     }
 
     /** A crafting grid, always three by three, an arrow and the result. */
-    private void recipe(GuiGraphicsExtractor graphics, Section.Recipe recipe, int x, int y) {
+    private void recipe(GuiGraphics graphics, Section.Recipe recipe, int x, int y) {
         for (int i = 0; i < 9; i++) {
             slot(graphics, recipe.grid().get(i), x + i % 3 * SLOT_SIZE, y + i / 3 * SLOT_SIZE);
         }
@@ -354,24 +351,24 @@ public class GuideBookScreen extends Screen {
     }
 
     /** The one slot of the book, for recipes and item squares alike, so every grid looks the same. */
-    private void slot(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y) {
+    private void slot(GuiGraphics graphics, ItemStack stack, int x, int y) {
         graphics.fill(x, y, x + SLOT_SIZE, y + SLOT_SIZE, theme.slotEdge());
         graphics.fill(x + 1, y + 1, x + SLOT_SIZE - 1, y + SLOT_SIZE - 1, theme.slot());
         item(graphics, stack, x + 1, y + 1);
     }
 
-    private void item(GuiGraphicsExtractor graphics, ItemStack stack, int x, int y) {
+    private void item(GuiGraphics graphics, ItemStack stack, int x, int y) {
         if (stack.isEmpty()) {
             return;
         }
-        graphics.item(stack, x, y);
+        graphics.renderItem(stack, x, y);
         if (mouseX >= x && mouseX < x + 16 && mouseY >= y && mouseY < y + 16) {
             hovered = stack;
         }
     }
 
     /** Vanilla container panel: transparent corner pixels, 1 px border, 2 px highlight, 2 px shadow. */
-    private void panel(GuiGraphicsExtractor graphics, int x0, int y0, int w, int h) {
+    private void panel(GuiGraphics graphics, int x0, int y0, int w, int h) {
         int x1 = x0 + w, y1 = y0 + h;
         int border = theme.border(), light = theme.light(), shadow = theme.shadow();
         graphics.fill(x0 + 1, y0 + 1, x1 - 1, y1 - 1, theme.panel());
@@ -400,7 +397,7 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             int x0 = getX(), y0 = getY(), x1 = x0 + getWidth(), y1 = y0 + getHeight();
             graphics.fill(x0, y0, x1, y1, theme.buttonEdge());
             graphics.fill(x0 + 1, y0 + 1, x1 - 1, y1 - 1, !active ? theme.buttonOff()
@@ -409,7 +406,7 @@ public class GuideBookScreen extends Screen {
                 graphics.fill(x0 + 1, y0 + 1, x1 - 1, y0 + 2, theme.buttonLight());
             }
             graphics.fill(x0 + 1, y1 - 2, x1 - 1, y1 - 1, theme.buttonShadow());
-            graphics.centeredText(font, getMessage(), (x0 + x1) / 2, y0 + (getHeight() - 8) / 2,
+            graphics.drawCenteredString(font, getMessage(), (x0 + x1) / 2, y0 + (getHeight() - 8) / 2,
                     active ? theme.buttonText() : theme.buttonTextOff());
         }
     }
@@ -431,14 +428,14 @@ public class GuideBookScreen extends Screen {
         }
 
         @Override
-        protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
             boolean open = pages.get(page).chapter() == chapter;
             int x0 = getX(), y0 = getY(), x1 = x0 + getWidth(), y1 = y0 + getHeight();
             graphics.fill(x0, y0, x1, y1, theme.border());
             graphics.fill(x0 + (open && right ? 0 : 1), y0 + 1, x1 - (open && !right ? 0 : 1), y1 - 1,
                     open ? theme.panel() : isHoveredOrFocused() ? theme.tabHover() : theme.tab());
             graphics.fill(x0 + 1, y0 + 1, x1 - 1, y0 + 2, theme.light());
-            graphics.item(chapters.get(chapter).icon(), x0 + 5, y0 + 4);
+            graphics.renderItem(chapters.get(chapter).icon(), x0 + 5, y0 + 4);
         }
     }
 }

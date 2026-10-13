@@ -1,9 +1,10 @@
 package bcf.guidebook;
 
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Consumer;
@@ -27,10 +28,10 @@ public class GuideBookItem extends Item {
     }
 
     @Override
-    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (level.isClientSide()) {
             opener.accept(book);
         }
-        return InteractionResult.SUCCESS;
+        return InteractionResultHolder.success(player.getItemInHand(hand));
     }
 }

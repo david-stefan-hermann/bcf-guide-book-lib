@@ -1,6 +1,6 @@
 # BCF Guide Book Lib
 
-The guide book of BaconCakeFactory's mods for Minecraft 26.2 (Fabric): one screen, one layout, one font and one way
+The guide book of BaconCakeFactory's mods for Minecraft 1.21.1 (Fabric): one screen, one layout, one font and one way
 to turn the pages, so every mod's book looks and works the same. A mod supplies its chapters and its colours; the
 library is bundled inside the mod's jar, players install nothing extra.
 
@@ -23,7 +23,7 @@ library is bundled inside the mod's jar, players install nothing extra.
 
 ## Using it in a mod
 
-`gradle.properties`: `guide_book_version=1.0.0+26.2`. `build.gradle`:
+`gradle.properties`: `guide_book_version=1.0.0+1.21.1`. `build.gradle`:
 
 ```groovy
 repositories {
@@ -34,7 +34,7 @@ repositories {
     }
 }
 dependencies {
-    implementation "de.baconcakefactory:bcf-guide-book-lib:${project.guide_book_version}"
+    modImplementation "de.baconcakefactory:bcf-guide-book-lib:${project.guide_book_version}"
     include "de.baconcakefactory:bcf-guide-book-lib:${project.guide_book_version}"
 }
 ```
@@ -66,7 +66,7 @@ compatible within a major version.
 
 ## Building
 
-Java 25, `./gradlew build publishToMavenLocal` → `build/libs/bcf-guide-book-lib-<version>.jar` and the copy in the
+JDK 25 to run Gradle (the jar is built for Java 21), `./gradlew build publishToMavenLocal` → `build/libs/bcf-guide-book-lib-<version>.jar` and the copy in the
 local Maven repository that the mods build against.
 
 ## License
