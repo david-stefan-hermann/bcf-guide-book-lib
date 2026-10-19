@@ -7,12 +7,10 @@ import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
@@ -31,7 +29,7 @@ import java.util.function.Supplier;
 /**
  * A mod's guide book: its colours and its chapters. The mod makes one in a static field, registers a
  * {@link GuideBookItem} under {@code guide_book} with it and writes the texts as translation keys
- * {@code <modid>.book.<name>}; the screen, the item's use and the welcome gift come from here.
+ * {@code <modid>.book.<name>}; the screen and the item's use come from here.
  */
 public final class Book {
     private static final Map<String, Book> BOOKS = new LinkedHashMap<>();
@@ -41,7 +39,6 @@ public final class Book {
     private final Supplier<List<Chapter>> chapters;
     private final AttachmentType<Boolean> gotBook;
     private Map<String, String> standIns = Map.of();
-    private Item item;
 
     private Book(String modId, BookTheme theme, Supplier<List<Chapter>> chapters) {
         this.modId = modId;
@@ -164,31 +161,23 @@ public final class Book {
         }
     }
 
-    // ---------------------------------------------------------------- the welcome gift
+    // ---------------------------------------------------------------- the welcome gift of 1.0
 
-    void item(Item item) {
-        this.item = item;
-    }
-
-    /** Set once the player has had the book; kept through death (vanilla entity tags are not). */
+    /** Set by the welcome gift of 1.0; nothing sets it any more, it stays registered so saved players load cleanly. */
     public AttachmentType<Boolean> gotBook() {
         return gotBook;
     }
 
-    /** The welcome gift: the book, once per player. */
+    /**
+     * Does nothing: with every mod giving its book, a new world started with a pile of them. Players craft the book
+     * or take it from the creative tab. Kept so mods built against 1.0 still run with this version.
+     */
+    @Deprecated
     public void giveOnce(ServerPlayer player) {
-        if (player.hasAttached(gotBook)) {
-            return;
-        }
-        ItemStack book = new ItemStack(item);
-        if (!player.getInventory().add(book)) {
-            player.drop(book, false);
-        }
-        player.setAttached(gotBook, true);
     }
 
-    /** Every player gets the book the first time they join; call once from the mod's initializer. */
+    /** Does nothing, see {@link #giveOnce}. */
+    @Deprecated
     public void giveOnJoin() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> giveOnce(handler.getPlayer()));
     }
 }

@@ -12,18 +12,20 @@ library is bundled inside the mod's jar, players install nothing extra.
 
 - **The screen:** a panel with one page, chapter tabs on the left and right, arrows and the page number below. Pages
   turn with the tabs, the arrows, the arrow and page keys or the mouse wheel, and the book opens where it was closed.
+  Escape or the inventory key (E by default) closes it.
 - **Pages that break themselves:** chapters are lists of sections; a section that does not fit starts the next page,
   a heading moves over with what follows it. No text runs off a page, in any language.
 - **Sections:** `Heading`, `Text`, `Quote`, `Note`, `ItemLine`, `Recipe`, `Pictures`, `ItemGrid`, `Break`.
 - **Recipes** are read from the mod's own recipe files; a tag ingredient shows a stand-in.
-- **The item:** `GuideBookItem` opens the screen; `Book.giveOnJoin()` gives every player one book, once.
+- **The item:** `GuideBookItem` opens the screen. Players craft it or take it from the creative tab; since 1.1 no book
+  is handed out on joining (`Book.giveOnJoin()` and `giveOnce()` are left in and do nothing).
 - **Checks:** in the dev environment the log says `BOOK PAGES`, `BOOK OVERFLOW` (a section taller than a page) and
   `BOOK KEY MISSING`; `Book.missingKeys("en_us", "de_de")` is for a mod's self-test; `-Dbcf.guidebook.shots=<modid>[,<modid>]`
   saves every page as a screenshot.
 
 ## Using it in a mod
 
-`gradle.properties`: `guide_book_version=1.0.0+26.2`. `build.gradle`:
+`gradle.properties`: `guide_book_version=1.1.0+26.2`. `build.gradle`:
 
 ```groovy
 repositories {

@@ -229,6 +229,10 @@ public class GuideBookScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
+        if (minecraft.options.keyInventory.matches(event)) {
+            onClose();
+            return true;
+        }
         switch (event.key()) {
             case GLFW.GLFW_KEY_LEFT, GLFW.GLFW_KEY_PAGE_UP -> turnTo(page - 1);
             case GLFW.GLFW_KEY_RIGHT, GLFW.GLFW_KEY_PAGE_DOWN -> turnTo(page + 1);

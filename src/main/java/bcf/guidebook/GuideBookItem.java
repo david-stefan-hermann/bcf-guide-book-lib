@@ -19,7 +19,6 @@ public class GuideBookItem extends Item {
     public GuideBookItem(Properties properties, Book book) {
         super(properties);
         this.book = book;
-        book.item(this);
     }
 
     public Book book() {
